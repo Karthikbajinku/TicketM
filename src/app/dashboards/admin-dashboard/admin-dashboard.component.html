@@ -1,0 +1,273 @@
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <p>Manage tickets, agents, and system overview</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'dashboard'"
+      (click)="setActiveTab('dashboard')"
+    >
+      Dashboard
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'tickets'"
+      (click)="setActiveTab('tickets')"
+    >
+      All Tickets
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'agents'"
+      (click)="setActiveTab('agents')"
+    >
+      Agents
+    </button>
+  </div>
+
+  <!-- Dashboard Overview -->
+  <div *ngIf="activeTab === 'dashboard'" class="dashboard-content">
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-number">{{ totalTickets }}</div>
+        <div class="stat-label">Total Tickets</div>
+      </div>
+      <div class="stat-card open">
+        <div class="stat-number">{{ openTickets }}</div>
+        <div class="stat-label">Open Tickets</div>
+      </div>
+      <div class="stat-card in-progress">
+        <div class="stat-number">{{ inProgressTickets }}</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-card resolved">
+        <div class="stat-number">{{ resolvedTickets }}</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+    </div>
+
+    <!-- Recent Tickets -->
+    <div class="card">
+      <h3>Recent Tickets</h3>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Agent</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ticket of filteredTickets.slice(0, 10)">
+              <td>#{{ ticket.id }}</td>
+              <td class="ticket-title">{{ ticket.title }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
+                  {{ ticket.status.replace('_', ' ') }}
+                </span>
+              </td>
+              <td>
+                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
+                  {{ ticket.priority }}
+                </span>
+              </td>
+              <td>{{ getAgentName(ticket.agentId!) }}</td>
+              <td>{{ ticket.createdAt | date:'short' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline" (click)="viewTicketDetails(ticket)">
+                  View
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Tickets Tab -->
+  <div *ngIf="activeTab === 'tickets'" class="tickets-content">
+    <!-- Filters -->
+    <div class="filters-section card">
+      <h3>Filter Tickets</h3>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Status</label>
+          <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="form-control">
+            <option value="">All Statuses</option>
+            <option value="OPEN">Open</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="AWAITING">Awaiting Response</option>
+            <option value="RESOLVED">Resolved</option>
+            <option value="REOPENED">Reopened</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Start Date</label>
+          <input 
+            type="date" 
+            [(ngModel)]="startDate" 
+            (change)="applyFilters()" 
+            class="form-control"
+          >
+        </div>
+        <div class="filter-group">
+          <label>End Date</label>
+          <input 
+            type="date" 
+            [(ngModel)]="endDate" 
+            (change)="applyFilters()" 
+            class="form-control"
+          >
+        </div>
+        <div class="filter-group">
+          <button class="btn btn-secondary" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="card">
+      <h3>All Tickets ({{ filteredTickets.length }})</h3>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Category</th>
+              <th>Agent</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ticket of filteredTickets">
+              <td>#{{ ticket.id }}</td>
+              <td class="ticket-title">{{ ticket.title }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
+                  {{ ticket.status.replace('_', ' ') }}
+                </span>
+              </td>
+              <td>
+                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
+                  {{ ticket.priority }}
+                </span>
+              </td>
+              <td>{{ ticket.category }}</td>
+              <td>{{ getAgentName(ticket.agentId!) }}</td>
+              <td>{{ ticket.createdAt | date:'short' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline" (click)="viewTicketDetails(ticket)">
+                  View Details
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agents Tab -->
+  <div *ngIf="activeTab === 'agents'" class="agents-content">
+    <div class="card">
+      <h3>Agents Overview</h3>
+      <div class="agents-grid">
+        <div *ngFor="let agent of agents" class="agent-card">
+          <div class="agent-info">
+            <h4>{{ agent.username }}</h4>
+            <p>{{ agent.email }}</p>
+            <span class="role-badge">{{ agent.role }}</span>
+          </div>
+          <div class="agent-stats">
+            <div class="stat">
+              <span class="stat-value">{{ getAverageRating(agent.id) || 'N/A' }}</span>
+              <span class="stat-label">Avg Rating</span>
+            </div>
+            <button class="btn btn-sm btn-primary" (click)="loadAgentRatings(agent.id)">
+              View Ratings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Details Modal -->
+  <div *ngIf="selectedTicket" class="modal-overlay" (click)="closeTicketDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ticket #{{ selectedTicket.id }} Details</h3>
+        <button class="close-btn" (click)="closeTicketDetails()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="ticket-info">
+          <h4>{{ selectedTicket.title }}</h4>
+          <p><strong>Description:</strong> {{ selectedTicket.description }}</p>
+          <div class="ticket-meta">
+            <span class="status-badge" [ngClass]="getStatusClass(selectedTicket.status)">
+              {{ selectedTicket.status.replace('_', ' ') }}
+            </span>
+            <span class="priority-badge" [ngClass]="getPriorityClass(selectedTicket.priority)">
+              {{ selectedTicket.priority }}
+            </span>
+            <span>Created: {{ selectedTicket.createdAt | date:'short' }}</span>
+          </div>
+        </div>
+
+        <!-- Ticket History -->
+        <div class="section">
+          <h4>History</h4>
+          <div class="history-list">
+            <div *ngFor="let history of ticketHistory" class="history-item">
+              <div class="history-content">
+                <strong>{{ history.userName }}</strong> {{ history.action }}
+                <span *ngIf="history.oldValue && history.newValue">
+                  from "{{ history.oldValue }}" to "{{ history.newValue }}"
+                </span>
+              </div>
+              <div class="history-time">{{ history.timestamp | date:'short' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket Notes -->
+        <div class="section">
+          <h4>Notes</h4>
+          <div class="notes-list">
+            <div *ngFor="let note of ticketNotes" class="note-item">
+              <div class="note-header">
+                <strong>{{ note.authorName }}</strong>
+                <span class="note-time">{{ note.createdAt | date:'short' }}</span>
+                <span *ngIf="note.isInternal" class="internal-badge">Internal</span>
+              </div>
+              <div class="note-content">{{ note.content }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+</div>
