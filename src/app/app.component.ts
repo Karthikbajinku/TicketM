@@ -19,8 +19,10 @@ export class AppComponent implements OnInit {
     // Hide navbar on login/register pages
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: NavigationEnd) => {
-      this.showNavbar = !this.isAuthPage(event.url);
+    ).subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.showNavbar = !this.isAuthPage(event.url);
+      }
     });
 
     // Global error handler

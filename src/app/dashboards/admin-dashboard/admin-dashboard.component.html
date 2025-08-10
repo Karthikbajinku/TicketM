@@ -76,9 +76,7 @@
                 </span>
               </td>
               <td>
-                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
-                  {{ ticket.priority }}
-                </span>
+<!-- Priority not available in backend -->
               </td>
               <td>{{ ticket.assignedTo?.name || 'Unassigned' }}</td>
               <td>{{ ticket.createdAt | date:'short' }}</td>
@@ -164,9 +162,7 @@
                 </span>
               </td>
               <td>
-                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
-                  {{ ticket.priority }}
-                </span>
+<!-- Priority not available in backend -->
               </td>
               <td>{{ ticket.category }}</td>
               <td>{{ ticket.assignedTo?.name || 'Unassigned' }}</td>
@@ -190,7 +186,7 @@
       <div class="agents-grid">
         <div *ngFor="let agent of agents" class="agent-card">
           <div class="agent-info">
-            <h4>{{ agent.username }}</h4>
+            <h4>{{ agent.name }}</h4>
             <p>{{ agent.email }}</p>
             <span class="role-badge">{{ agent.role }}</span>
           </div>
@@ -237,12 +233,10 @@
           <div class="history-list">
             <div *ngFor="let history of ticketHistory" class="history-item">
               <div class="history-content">
-                <strong>{{ history.userName }}</strong> {{ history.action }}
-                <span *ngIf="history.oldValue && history.newValue">
-                  from "{{ history.oldValue }}" to "{{ history.newValue }}"
-                </span>
+                <strong>{{ history.performedBy.name }}</strong> {{ history.action }}
+                <div>{{ history.description }}</div>
               </div>
-              <div class="history-time">{{ history.timestamp | date:'short' }}</div>
+              <div class="history-time">{{ history.performedAt | date:'short' }}</div>
             </div>
           </div>
         </div>
@@ -253,11 +247,11 @@
           <div class="notes-list">
             <div *ngFor="let note of ticketNotes" class="note-item">
               <div class="note-header">
-                <strong>{{ note.authorName }}</strong>
+                <strong>{{ note.author.name }}</strong>
                 <span class="note-time">{{ note.createdAt | date:'short' }}</span>
-                <span *ngIf="note.isInternal" class="internal-badge">Internal</span>
+<!-- Internal flag not available -->
               </div>
-              <div class="note-content">{{ note.content }}</div>
+              <div class="note-content">{{ note.note }}</div>
             </div>
           </div>
         </div>
