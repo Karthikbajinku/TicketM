@@ -112,9 +112,24 @@ export class TicketService {
 
   // Rating operations
   addRating(ratingData: { ticketId: number; agentId: number; score: number; comments?: string }): Observable<Rating> {
-    return this.http.post<Rating>(`${this.baseUrl}/ratings/add`, ratingData, {
+    // Create full Rating object for backend
+    const fullRating = {
+      ticket: { id: ratingData.ticketId },
+      givenBy: { id: this.getCurrentUserId() },
+      agent: { id: ratingData.agentId },
+      score: ratingData.score,
+      comments: ratingData.comments,
+      createdAt: new Date().toISOString()
+    };
+
+    return this.http.post<Rating>(`${this.baseUrl}/ratings/add`, fullRating, {
       headers: this.getHeaders()
     });
+  }
+
+  private getCurrentUserId(): number {
+    const user = this.authService.getCurrentUser();
+    return user ? user.id : 0;
   }
 
   getAgentRatings(agentId: number): Observable<Rating[]> {

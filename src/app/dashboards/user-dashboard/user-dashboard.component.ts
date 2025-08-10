@@ -149,14 +149,12 @@ export class UserDashboardComponent implements OnInit {
     if (this.ratingForm.invalid || !this.ticketToRate) return;
     
     this.submittingRating = true;
-    // Create rating object that matches backend Rating entity
+    // Create rating data that matches service method signature
     const ratingData = {
-      ticket: { id: this.ticketToRate.id },
-      givenBy: { id: this.currentUser!.id },
-      agent: { id: this.ticketToRate.assignedTo!.id },
+      ticketId: this.ticketToRate.id,
+      agentId: this.ticketToRate.assignedTo!.id,
       score: this.ratingForm.value.rating,
-      comments: this.ratingForm.value.feedback || undefined,
-      createdAt: new Date().toISOString()
+      comments: this.ratingForm.value.feedback || undefined
     };
 
     this.ticketService.addRating(ratingData).subscribe({
