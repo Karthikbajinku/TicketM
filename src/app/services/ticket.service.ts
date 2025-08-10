@@ -66,20 +66,20 @@ export class TicketService {
     });
   }
 
-  updateTicketStatus(ticketId: number, status: string): Observable<Ticket> {
+  updateTicketStatus(ticketId: string, status: string): Observable<Ticket> {
     return this.http.put<Ticket>(`${this.baseUrl}/tickets/${ticketId}/status`, { status }, {
       headers: this.getHeaders()
     });
   }
 
-  updateTicketDescription(ticketId: number, description: string): Observable<Ticket> {
+  updateTicketDescription(ticketId: string, description: string): Observable<Ticket> {
     return this.http.put<Ticket>(`${this.baseUrl}/tickets/${ticketId}/description`, { description }, {
       headers: this.getHeaders()
     });
   }
 
   // Notes operations
-  addNote(noteData: { ticketId: number; content: string; isInternal: boolean }): Observable<TicketNote> {
+  addNote(noteData: { ticketId: number; authorId: number; note: string }): Observable<TicketNote> {
     return this.http.post<TicketNote>(`${this.baseUrl}/notes/add`, noteData, {
       headers: this.getHeaders()
     });
@@ -99,7 +99,7 @@ export class TicketService {
   }
 
   // Rating operations
-  addRating(ratingData: { ticketId: number; agentId: number; rating: number; feedback?: string }): Observable<Rating> {
+  addRating(ratingData: { ticketId: number; agentId: number; score: number; comments?: string }): Observable<Rating> {
     return this.http.post<Rating>(`${this.baseUrl}/ratings/add`, ratingData, {
       headers: this.getHeaders()
     });
