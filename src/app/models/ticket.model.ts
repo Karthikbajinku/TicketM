@@ -1,53 +1,46 @@
 export interface Ticket {
   id: number;
+  ticketId: string;
   title: string;
   description: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'AWAITING' | 'RESOLVED' | 'REOPENED';
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  status: 'OPEN' | 'IN_PROGRESS' | 'AWAITING_RESPONSE' | 'RESOLVED' | 'REOPENED' | 'CLOSED';
   category: string;
-  subcategory: string;
-  userId: number;
-  agentId?: number;
+  subCategory: string;
   createdAt: string;
-  updatedAt: string;
-  resolvedAt?: string;
+  createdBy: User;
+  assignedTo?: User;
 }
 
 export interface CreateTicketRequest {
   title: string;
   description: string;
   category: string;
-  subcategory: string;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  subCategory: string;
 }
 
 export interface TicketNote {
   id: number;
-  ticketId: number;
-  content: string;
-  authorId: number;
-  authorName: string;
+  ticket: Ticket;
+  author: User;
+  note: string;
   createdAt: string;
-  isInternal: boolean;
 }
 
 export interface TicketHistory {
   id: number;
-  ticketId: number;
+  ticket: Ticket;
   action: string;
-  oldValue?: string;
-  newValue?: string;
-  userId: number;
-  userName: string;
-  timestamp: string;
+  description: string;
+  performedBy: User;
+  performedAt: string;
 }
 
 export interface Rating {
   id: number;
-  ticketId: number;
-  agentId: number;
-  userId: number;
-  rating: number;
-  feedback?: string;
+  ticket: Ticket;
+  givenBy: User;
+  agent: User;
+  score: number;
+  comments?: string;
   createdAt: string;
 }
