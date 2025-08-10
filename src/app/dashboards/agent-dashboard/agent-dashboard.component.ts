@@ -108,9 +108,9 @@ export class AgentDashboardComponent implements OnInit {
 
   updateTicketStatus(): void {
     if (!this.selectedTicket || !this.selectedStatus) return;
-    
+
     this.updatingStatus = true;
-    this.ticketService.updateTicketStatus(this.selectedTicket.id, this.selectedStatus).subscribe({
+    this.ticketService.updateTicketStatus(this.selectedTicket.ticketId, this.selectedStatus).subscribe({
       next: (updatedTicket) => {
         // Update the ticket in the list
         const index = this.tickets.findIndex(t => t.id === updatedTicket.id);
@@ -129,13 +129,13 @@ export class AgentDashboardComponent implements OnInit {
   }
 
   addNote(): void {
-    if (!this.selectedTicket || !this.newNote.trim()) return;
-    
+    if (!this.selectedTicket || !this.newNote.trim() || !this.currentUser) return;
+
     this.addingNote = true;
     const noteData = {
       ticketId: this.selectedTicket.id,
-      content: this.newNote.trim(),
-      isInternal: false
+      authorId: this.currentUser.id,
+      note: this.newNote.trim()
     };
 
     this.ticketService.addNote(noteData).subscribe({
