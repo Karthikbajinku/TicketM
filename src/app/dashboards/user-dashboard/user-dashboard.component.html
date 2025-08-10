@@ -103,35 +103,19 @@
       <h3>Create New Ticket</h3>
       
       <form [formGroup]="createTicketForm" (ngSubmit)="createTicket()" class="create-ticket-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="title">Ticket Title *</label>
-            <input
-              type="text"
-              id="title"
-              class="form-control"
-              formControlName="title"
-              placeholder="Brief description of your issue"
-              [class.error]="createTicketForm.get('title')?.invalid && createTicketForm.get('title')?.touched"
-            >
-            <div class="error-message" *ngIf="createTicketForm.get('title')?.invalid && createTicketForm.get('title')?.touched">
-              <span *ngIf="createTicketForm.get('title')?.errors?.['required']">Title is required</span>
-              <span *ngIf="createTicketForm.get('title')?.errors?.['minlength']">Title must be at least 5 characters</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="priority">Priority *</label>
-            <select
-              id="priority"
-              class="form-control"
-              formControlName="priority"
-            >
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
-            </select>
+        <div class="form-group">
+          <label for="title">Ticket Title *</label>
+          <input
+            type="text"
+            id="title"
+            class="form-control"
+            formControlName="title"
+            placeholder="Brief description of your issue"
+            [class.error]="createTicketForm.get('title')?.invalid && createTicketForm.get('title')?.touched"
+          >
+          <div class="error-message" *ngIf="createTicketForm.get('title')?.invalid && createTicketForm.get('title')?.touched">
+            <span *ngIf="createTicketForm.get('title')?.errors?.['required']">Title is required</span>
+            <span *ngIf="createTicketForm.get('title')?.errors?.['minlength']">Title must be at least 5 characters</span>
           </div>
         </div>
 
@@ -156,20 +140,20 @@
           </div>
 
           <div class="form-group">
-            <label for="subcategory">Subcategory *</label>
+            <label for="subCategory">Subcategory *</label>
             <select
-              id="subcategory"
+              id="subCategory"
               class="form-control"
-              formControlName="subcategory"
+              formControlName="subCategory"
               [disabled]="!createTicketForm.get('category')?.value"
-              [class.error]="createTicketForm.get('subcategory')?.invalid && createTicketForm.get('subcategory')?.touched"
+              [class.error]="createTicketForm.get('subCategory')?.invalid && createTicketForm.get('subCategory')?.touched"
             >
               <option value="">Select a subcategory</option>
               <option *ngFor="let subcategory of getSubcategories()" [value]="subcategory">
                 {{ subcategory }}
               </option>
             </select>
-            <div class="error-message" *ngIf="createTicketForm.get('subcategory')?.invalid && createTicketForm.get('subcategory')?.touched">
+            <div class="error-message" *ngIf="createTicketForm.get('subCategory')?.invalid && createTicketForm.get('subCategory')?.touched">
               Subcategory is required
             </div>
           </div>
