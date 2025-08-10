@@ -30,4 +30,16 @@ export class NavbarComponent implements OnInit {
   isLoginPage(): boolean {
     return this.router.url === '/login' || this.router.url === '/register';
   }
+
+  getRoleClass(): string {
+    return this.currentUser ? `role-${this.currentUser.role.toLowerCase()}` : '';
+  }
+
+  getUserRole(): string {
+    return this.currentUser ? this.currentUser.role : '';
+  }
+
+  getUserName(): string {
+    return this.currentUser ? this.currentUser.username : '';
+  }
 }
