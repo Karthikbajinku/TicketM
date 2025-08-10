@@ -52,8 +52,7 @@ export class UserDashboardComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(5)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       category: ['', Validators.required],
-      subcategory: ['', Validators.required],
-      priority: ['MEDIUM', Validators.required]
+      subCategory: ['', Validators.required]
     });
 
     this.ratingForm = this.formBuilder.group({
@@ -93,7 +92,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   onCategoryChange(): void {
-    this.createTicketForm.patchValue({ subcategory: '' });
+    this.createTicketForm.patchValue({ subCategory: '' });
   }
 
   getSubcategories(): string[] {
@@ -113,7 +112,6 @@ export class UserDashboardComponent implements OnInit {
         this.tickets.unshift(ticket);
         this.calculateStats();
         this.createTicketForm.reset();
-        this.createTicketForm.patchValue({ priority: 'MEDIUM' });
         this.showCreateForm = false;
         this.submittingTicket = false;
       },
