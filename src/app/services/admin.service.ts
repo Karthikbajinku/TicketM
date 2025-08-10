@@ -16,9 +16,7 @@ export class AdminService {
   ) {}
 
   private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
   }
@@ -36,7 +34,10 @@ export class AdminService {
   }
 
   updateUserRole(userId: number, role: string): Observable<User> {
-    return this.http.put<User>(`${this.baseUrl}/${userId}/role`, { role }, {
+    const params = new URLSearchParams();
+    params.append('role', role);
+
+    return this.http.put<User>(`${this.baseUrl}/${userId}/role?${params.toString()}`, null, {
       headers: this.getHeaders()
     });
   }
