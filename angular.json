@@ -33,8 +33,7 @@
           "options": {
             "buildTarget": "it-ticket-management:build",
             "port": 4201,
-            "verbose": false,
-            "progress": false
+            "verbose": false
           },
           "configurations": {
             "production": {
