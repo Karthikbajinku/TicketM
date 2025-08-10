@@ -32,7 +32,9 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "buildTarget": "it-ticket-management:build",
-            "port": 4201
+            "port": 4201,
+            "verbose": false,
+            "progress": false
           },
           "configurations": {
             "production": {
