@@ -164,9 +164,9 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   getAverageRating(agentId: number): number {
-    const ratings = this.agentRatings.filter(r => r.agentId === agentId);
+    const ratings = this.agentRatings.filter(r => r.agent.id === agentId);
     if (ratings.length === 0) return 0;
-    const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+    const sum = ratings.reduce((acc, r) => acc + r.score, 0);
     return Math.round((sum / ratings.length) * 10) / 10;
   }
 
