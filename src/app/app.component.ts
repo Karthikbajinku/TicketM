@@ -25,13 +25,26 @@ export class AppComponent implements OnInit {
       }
     });
 
-    // Global error handler
+    // Enhanced global error handler
     window.addEventListener('error', (event) => {
-      console.error('Global error caught:', event.error);
+      console.error('Global error caught:', {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        error: event.error,
+        stack: event.error?.stack
+      });
+      event.preventDefault();
     });
 
     window.addEventListener('unhandledrejection', (event) => {
-      console.error('Unhandled promise rejection:', event.reason);
+      console.error('Unhandled promise rejection:', {
+        reason: event.reason,
+        promise: event.promise,
+        stack: event.reason?.stack
+      });
+      event.preventDefault();
     });
   }
 

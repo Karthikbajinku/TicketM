@@ -17,9 +17,18 @@ export class NavbarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-    });
+    try {
+      this.authService.currentUser$.subscribe({
+        next: (user) => {
+          this.currentUser = user;
+        },
+        error: (error) => {
+          console.error('Error in navbar user subscription:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing navbar:', error);
+    }
   }
 
   logout(): void {
