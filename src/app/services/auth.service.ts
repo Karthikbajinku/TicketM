@@ -19,9 +19,14 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, credentials)
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
+          try {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            this.currentUserSubject.next(response.user);
+          } catch (error) {
+            console.error('Error storing login data:', error);
+            throw error;
+          }
         })
       );
   }
@@ -54,10 +59,18 @@ export class AuthService {
   }
 
   private loadUserFromStorage(): void {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      this.currentUserSubject.next(user);
+    try {
+      const userJson = localStorage.getItem('user');
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        this.currentUserSubject.next(user);
+      }
+    } catch (error) {
+      console.error('Error loading user from storage:', error);
+      // Clear corrupted data
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      this.currentUserSubject.next(null);
     }
   }
 }
