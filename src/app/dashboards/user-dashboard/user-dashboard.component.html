@@ -1,0 +1,337 @@
+<div class="user-dashboard">
+  <div class="dashboard-header">
+    <h1>User Dashboard</h1>
+    <p>Create and manage your IT support tickets</p>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ totalTickets }}</div>
+      <div class="stat-label">Total Tickets</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ openTickets }}</div>
+      <div class="stat-label">Open/In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ resolvedTickets }}</div>
+      <div class="stat-label">Resolved</div>
+    </div>
+    <div class="stat-card action-card" (click)="setActiveTab('create')">
+      <div class="stat-icon">+</div>
+      <div class="stat-label">Create New Ticket</div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'tickets'"
+      (click)="setActiveTab('tickets')"
+    >
+      My Tickets
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'create'"
+      (click)="setActiveTab('create')"
+    >
+      Create Ticket
+    </button>
+  </div>
+
+  <!-- My Tickets Tab -->
+  <div *ngIf="activeTab === 'tickets'" class="tickets-content">
+    <div class="tickets-section">
+      <div class="card">
+        <h3>My Tickets</h3>
+        
+        <div *ngIf="loading" class="loading-message">
+          Loading your tickets...
+        </div>
+
+        <div *ngIf="!loading && tickets.length === 0" class="empty-message">
+          <p>You haven't created any tickets yet.</p>
+          <button class="btn btn-primary" (click)="setActiveTab('create')">
+            Create Your First Ticket
+          </button>
+        </div>
+
+        <div *ngIf="!loading && tickets.length > 0" class="tickets-list">
+          <div 
+            *ngFor="let ticket of tickets" 
+            class="ticket-item"
+            (click)="selectTicket(ticket)"
+          >
+            <div class="ticket-header">
+              <h4>#{{ ticket.id }} - {{ ticket.title }}</h4>
+              <div class="ticket-badges">
+                <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
+                  {{ ticket.status.replace('_', ' ') }}
+                </span>
+                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
+                  {{ ticket.priority }}
+                </span>
+              </div>
+            </div>
+            <div class="ticket-meta">
+              <span>{{ ticket.category }} / {{ ticket.subcategory }}</span>
+              <span>Created: {{ ticket.createdAt | date:'short' }}</span>
+            </div>
+            <div class="ticket-description">
+              {{ ticket.description }}
+            </div>
+            <div class="ticket-actions" *ngIf="canRate(ticket)">
+              <button 
+                class="btn btn-sm btn-outline rating-btn"
+                (click)="openRatingModal(ticket); $event.stopPropagation()"
+              >
+                Rate Support
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Ticket Tab -->
+  <div *ngIf="activeTab === 'create'" class="create-ticket-content">
+    <div class="card">
+      <h3>Create New Ticket</h3>
+      
+      <form [formGroup]="createTicketForm" (ngSubmit)="createTicket()" class="create-ticket-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="title">Ticket Title *</label>
+            <input
+              type="text"
+              id="title"
+              class="form-control"
+              formControlName="title"
+              placeholder="Brief description of your issue"
+              [class.error]="createTicketForm.get('title')?.invalid && createTicketForm.get('title')?.touched"
+            >
+            <div class="error-message" *ngIf="createTicketForm.get('title')?.invalid && createTicketForm.get('title')?.touched">
+              <span *ngIf="createTicketForm.get('title')?.errors?.['required']">Title is required</span>
+              <span *ngIf="createTicketForm.get('title')?.errors?.['minlength']">Title must be at least 5 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="priority">Priority *</label>
+            <select
+              id="priority"
+              class="form-control"
+              formControlName="priority"
+            >
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+              <option value="URGENT">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Category *</label>
+            <select
+              id="category"
+              class="form-control"
+              formControlName="category"
+              (change)="onCategoryChange()"
+              [class.error]="createTicketForm.get('category')?.invalid && createTicketForm.get('category')?.touched"
+            >
+              <option value="">Select a category</option>
+              <option *ngFor="let category of categories" [value]="category.name">
+                {{ category.name }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="createTicketForm.get('category')?.invalid && createTicketForm.get('category')?.touched">
+              Category is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="subcategory">Subcategory *</label>
+            <select
+              id="subcategory"
+              class="form-control"
+              formControlName="subcategory"
+              [disabled]="!createTicketForm.get('category')?.value"
+              [class.error]="createTicketForm.get('subcategory')?.invalid && createTicketForm.get('subcategory')?.touched"
+            >
+              <option value="">Select a subcategory</option>
+              <option *ngFor="let subcategory of getSubcategories()" [value]="subcategory">
+                {{ subcategory }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="createTicketForm.get('subcategory')?.invalid && createTicketForm.get('subcategory')?.touched">
+              Subcategory is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            class="form-control"
+            formControlName="description"
+            placeholder="Please provide detailed information about your issue..."
+            rows="5"
+            [class.error]="createTicketForm.get('description')?.invalid && createTicketForm.get('description')?.touched"
+          ></textarea>
+          <div class="error-message" *ngIf="createTicketForm.get('description')?.invalid && createTicketForm.get('description')?.touched">
+            <span *ngIf="createTicketForm.get('description')?.errors?.['required']">Description is required</span>
+            <span *ngIf="createTicketForm.get('description')?.errors?.['minlength']">Description must be at least 10 characters</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="createTicketForm.invalid || submittingTicket"
+          >
+            <span *ngIf="submittingTicket">Creating Ticket...</span>
+            <span *ngIf="!submittingTicket">Create Ticket</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="setActiveTab('tickets')"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ticket Details Modal -->
+  <div *ngIf="selectedTicket" class="modal-overlay" (click)="closeTicketDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ticket #{{ selectedTicket.id }} Details</h3>
+        <button class="close-btn" (click)="closeTicketDetails()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="ticket-info">
+          <h4>{{ selectedTicket.title }}</h4>
+          <p><strong>Description:</strong> {{ selectedTicket.description }}</p>
+          <div class="ticket-meta-details">
+            <div class="meta-row">
+              <span><strong>Category:</strong> {{ selectedTicket.category }} / {{ selectedTicket.subcategory }}</span>
+              <span class="status-badge" [ngClass]="getStatusClass(selectedTicket.status)">
+                {{ selectedTicket.status.replace('_', ' ') }}
+              </span>
+            </div>
+            <div class="meta-row">
+              <span><strong>Priority:</strong> 
+                <span class="priority-badge" [ngClass]="getPriorityClass(selectedTicket.priority)">
+                  {{ selectedTicket.priority }}
+                </span>
+              </span>
+            </div>
+            <div class="meta-row">
+              <span><strong>Created:</strong> {{ selectedTicket.createdAt | date:'medium' }}</span>
+            </div>
+            <div class="meta-row" *ngIf="selectedTicket.updatedAt !== selectedTicket.createdAt">
+              <span><strong>Last Updated:</strong> {{ selectedTicket.updatedAt | date:'medium' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Messages -->
+        <div class="messages-section" *ngIf="ticketNotes.length > 0">
+          <h4>Support Messages</h4>
+          <div class="messages-list">
+            <div *ngFor="let note of ticketNotes" class="message-item">
+              <div class="message-header">
+                <strong>{{ note.authorName }}</strong>
+                <span class="message-time">{{ note.createdAt | date:'short' }}</span>
+              </div>
+              <div class="message-content">{{ note.content }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rate Support Button -->
+        <div class="rating-section" *ngIf="canRate(selectedTicket)">
+          <button class="btn btn-success" (click)="openRatingModal(selectedTicket)">
+            Rate Support Quality
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating Modal -->
+  <div *ngIf="showRatingModal" class="modal-overlay" (click)="closeRatingModal()">
+    <div class="modal-content rating-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Rate Support for Ticket #{{ ticketToRate?.id }}</h3>
+        <button class="close-btn" (click)="closeRatingModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <form [formGroup]="ratingForm" (ngSubmit)="submitRating()">
+          <div class="form-group">
+            <label>How satisfied are you with the support received?</label>
+            <div class="rating-input">
+              <div class="star-rating">
+                <input type="radio" formControlName="rating" value="1" id="star1">
+                <label for="star1">★</label>
+                <input type="radio" formControlName="rating" value="2" id="star2">
+                <label for="star2">★</label>
+                <input type="radio" formControlName="rating" value="3" id="star3">
+                <label for="star3">★</label>
+                <input type="radio" formControlName="rating" value="4" id="star4">
+                <label for="star4">★</label>
+                <input type="radio" formControlName="rating" value="5" id="star5">
+                <label for="star5">★</label>
+              </div>
+              <div class="rating-text">
+                {{ ratingForm.get('rating')?.value }}/5 Stars
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="feedback">Additional Feedback (Optional)</label>
+            <textarea
+              id="feedback"
+              class="form-control"
+              formControlName="feedback"
+              placeholder="Share your experience with the support team..."
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="ratingForm.invalid || submittingRating"
+            >
+              <span *ngIf="submittingRating">Submitting...</span>
+              <span *ngIf="!submittingRating">Submit Rating</span>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="closeRatingModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
