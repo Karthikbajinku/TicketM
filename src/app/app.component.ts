@@ -94,14 +94,20 @@ export class AppComponent implements OnInit {
     // Specifically handle webpack-dev-server events
     if (typeof EventSource !== 'undefined') {
       const originalEventSource = EventSource.prototype.addEventListener;
-      EventSource.prototype.addEventListener = function(type, listener, options) {
-        const wrappedListener = (event) => {
+      EventSource.prototype.addEventListener = function(
+        type: string,
+        listener: EventListenerOrEventListenerObject | null,
+        options?: boolean | AddEventListenerOptions
+      ) {
+        const wrappedListener = (event: Event) => {
           if (event && typeof event === 'object' && event.constructor === Event) {
             console.log('EventSource event intercepted:', type, event);
             return;
           }
           if (typeof listener === 'function') {
             return listener(event);
+          } else if (listener && typeof listener.handleEvent === 'function') {
+            return listener.handleEvent(event);
           }
         };
         return originalEventSource.call(this, type, wrappedListener, options);
