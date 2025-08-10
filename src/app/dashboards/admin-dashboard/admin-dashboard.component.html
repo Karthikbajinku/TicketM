@@ -68,7 +68,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let ticket of filteredTickets.slice(0, 10)">
-              <td>#{{ ticket.id }}</td>
+              <td>{{ ticket.ticketId }}</td>
               <td class="ticket-title">{{ ticket.title }}</td>
               <td>
                 <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
@@ -80,7 +80,7 @@
                   {{ ticket.priority }}
                 </span>
               </td>
-              <td>{{ getAgentName(ticket.agentId!) }}</td>
+              <td>{{ ticket.assignedTo?.name || 'Unassigned' }}</td>
               <td>{{ ticket.createdAt | date:'short' }}</td>
               <td>
                 <button class="btn btn-sm btn-outline" (click)="viewTicketDetails(ticket)">
@@ -156,7 +156,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let ticket of filteredTickets">
-              <td>#{{ ticket.id }}</td>
+              <td>{{ ticket.ticketId }}</td>
               <td class="ticket-title">{{ ticket.title }}</td>
               <td>
                 <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
@@ -169,7 +169,7 @@
                 </span>
               </td>
               <td>{{ ticket.category }}</td>
-              <td>{{ getAgentName(ticket.agentId!) }}</td>
+              <td>{{ ticket.assignedTo?.name || 'Unassigned' }}</td>
               <td>{{ ticket.createdAt | date:'short' }}</td>
               <td>
                 <button class="btn btn-sm btn-outline" (click)="viewTicketDetails(ticket)">
