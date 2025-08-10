@@ -51,13 +51,11 @@
                 <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
                   {{ ticket.status.replace('_', ' ') }}
                 </span>
-                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
-                  {{ ticket.priority }}
-                </span>
+<!-- Priority not available in backend -->
               </div>
             </div>
             <div class="ticket-meta">
-              <span>{{ ticket.category }} / {{ ticket.subcategory }}</span>
+              <span>{{ ticket.category }} / {{ ticket.subCategory }}</span>
               <span>Created: {{ ticket.createdAt | date:'short' }}</span>
             </div>
             <div class="ticket-description">
@@ -82,9 +80,9 @@
             <h4>{{ selectedTicket.title }}</h4>
             <p><strong>Description:</strong> {{ selectedTicket.description }}</p>
             <div class="ticket-meta-details">
-              <span><strong>Category:</strong> {{ selectedTicket.category }} / {{ selectedTicket.subcategory }}</span>
+              <span><strong>Category:</strong> {{ selectedTicket.category }} / {{ selectedTicket.subCategory }}</span>
               <span><strong>Created:</strong> {{ selectedTicket.createdAt | date:'medium' }}</span>
-              <span><strong>Last Updated:</strong> {{ selectedTicket.updatedAt | date:'medium' }}</span>
+<!-- Last updated not available in backend -->
             </div>
           </div>
 
@@ -120,11 +118,11 @@
             <div class="existing-notes">
               <div *ngFor="let note of ticketNotes" class="note-item">
                 <div class="note-header">
-                  <strong>{{ note.authorName }}</strong>
+                  <strong>{{ note.author.name }}</strong>
                   <span class="note-time">{{ note.createdAt | date:'short' }}</span>
-                  <span *ngIf="note.isInternal" class="internal-badge">Internal</span>
+<!-- Internal flag not available -->
                 </div>
-                <div class="note-content">{{ note.content }}</div>
+                <div class="note-content">{{ note.note }}</div>
               </div>
             </div>
 
@@ -165,15 +163,15 @@
     <div *ngIf="myRatings.length > 0" class="ratings-list">
       <div *ngFor="let rating of myRatings" class="rating-item">
         <div class="rating-header">
-          <span class="rating-stars">{{ getRatingStars(rating.rating) }}</span>
-          <span class="rating-value">{{ rating.rating }}/5</span>
+          <span class="rating-stars">{{ getRatingStars(rating.score) }}</span>
+          <span class="rating-value">{{ rating.score }}/5</span>
           <span class="rating-date">{{ rating.createdAt | date:'short' }}</span>
         </div>
-        <div class="rating-feedback" *ngIf="rating.feedback">
-          "{{ rating.feedback }}"
+        <div class="rating-feedback" *ngIf="rating.comments">
+          "{{ rating.comments }}"
         </div>
         <div class="rating-ticket">
-          Ticket #{{ rating.ticketId }}
+          Ticket {{ rating.ticket.ticketId }}
         </div>
       </div>
     </div>
