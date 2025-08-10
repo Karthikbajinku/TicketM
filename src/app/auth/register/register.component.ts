@@ -20,11 +20,12 @@ export class RegisterComponent {
     private router: Router
   ) {
     this.registerForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
-      role: ['USER', Validators.required]
+      role: ['USER', Validators.required],
+      category: ['']
     }, { validators: this.passwordMatchValidator });
   }
 

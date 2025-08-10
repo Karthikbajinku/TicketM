@@ -7,18 +7,18 @@
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="name">Full Name</label>
         <input
           type="text"
-          id="username"
+          id="name"
           class="form-control"
-          formControlName="username"
-          placeholder="Enter your username"
-          [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+          formControlName="name"
+          placeholder="Enter your full name"
+          [class.error]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
         >
-        <div class="error-message" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
-          <span *ngIf="registerForm.get('username')?.errors?.['required']">Username is required</span>
-          <span *ngIf="registerForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
+        <div class="error-message" *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+          <span *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</span>
+          <span *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
         </div>
       </div>
 
@@ -47,6 +47,22 @@
         >
           <option value="USER">User (Employee)</option>
           <option value="AGENT">Agent (Support Staff)</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="registerForm.get('role')?.value === 'AGENT'">
+        <label for="category">Specialization Category</label>
+        <select
+          id="category"
+          class="form-control"
+          formControlName="category"
+        >
+          <option value="">Select category</option>
+          <option value="Technical">Technical</option>
+          <option value="Billing">Billing</option>
+          <option value="General">General Support</option>
+          <option value="Security">Security</option>
+          <option value="Network">Network</option>
         </select>
       </div>
 
