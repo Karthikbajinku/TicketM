@@ -1,0 +1,181 @@
+<div class="agent-dashboard">
+  <div class="dashboard-header">
+    <h1>Agent Dashboard</h1>
+    <p>Manage your assigned tickets and provide support</p>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ totalAssigned }}</div>
+      <div class="stat-label">Total Assigned</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ inProgress }}</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ resolved }}</div>
+      <div class="stat-label">Resolved</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ averageRating || 'N/A' }}</div>
+      <div class="stat-label">Avg Rating</div>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- Tickets List -->
+    <div class="tickets-section">
+      <div class="card">
+        <h3>My Assigned Tickets</h3>
+        
+        <div *ngIf="loading" class="loading-message">
+          Loading tickets...
+        </div>
+
+        <div *ngIf="!loading && tickets.length === 0" class="empty-message">
+          No tickets assigned to you yet.
+        </div>
+
+        <div *ngIf="!loading && tickets.length > 0" class="tickets-list">
+          <div 
+            *ngFor="let ticket of tickets" 
+            class="ticket-item"
+            [class.selected]="selectedTicket?.id === ticket.id"
+            (click)="selectTicket(ticket)"
+          >
+            <div class="ticket-header">
+              <h4>#{{ ticket.id }} - {{ ticket.title }}</h4>
+              <div class="ticket-badges">
+                <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
+                  {{ ticket.status.replace('_', ' ') }}
+                </span>
+                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
+                  {{ ticket.priority }}
+                </span>
+              </div>
+            </div>
+            <div class="ticket-meta">
+              <span>{{ ticket.category }} / {{ ticket.subcategory }}</span>
+              <span>Created: {{ ticket.createdAt | date:'short' }}</span>
+            </div>
+            <div class="ticket-description">
+              {{ ticket.description }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticket Details Panel -->
+    <div *ngIf="selectedTicket" class="ticket-details-section">
+      <div class="card">
+        <div class="ticket-details-header">
+          <h3>Ticket #{{ selectedTicket.id }} Details</h3>
+          <button class="close-btn" (click)="closeTicketDetails()">&times;</button>
+        </div>
+
+        <div class="ticket-details-content">
+          <!-- Ticket Information -->
+          <div class="ticket-info">
+            <h4>{{ selectedTicket.title }}</h4>
+            <p><strong>Description:</strong> {{ selectedTicket.description }}</p>
+            <div class="ticket-meta-details">
+              <span><strong>Category:</strong> {{ selectedTicket.category }} / {{ selectedTicket.subcategory }}</span>
+              <span><strong>Created:</strong> {{ selectedTicket.createdAt | date:'medium' }}</span>
+              <span><strong>Last Updated:</strong> {{ selectedTicket.updatedAt | date:'medium' }}</span>
+            </div>
+          </div>
+
+          <!-- Status Update -->
+          <div class="status-update-section">
+            <h4>Update Status</h4>
+            <div class="status-controls">
+              <select 
+                [(ngModel)]="selectedStatus" 
+                class="form-control"
+                [disabled]="!canUpdateStatus()"
+              >
+                <option *ngFor="let status of getStatusOptions()" [value]="status">
+                  {{ status.replace('_', ' ') }}
+                </option>
+              </select>
+              <button 
+                class="btn btn-primary"
+                (click)="updateTicketStatus()"
+                [disabled]="updatingStatus || selectedStatus === selectedTicket.status"
+              >
+                <span *ngIf="updatingStatus">Updating...</span>
+                <span *ngIf="!updatingStatus">Update Status</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Notes Section -->
+          <div class="notes-section">
+            <h4>Communication</h4>
+            
+            <!-- Existing Notes -->
+            <div class="existing-notes">
+              <div *ngFor="let note of ticketNotes" class="note-item">
+                <div class="note-header">
+                  <strong>{{ note.authorName }}</strong>
+                  <span class="note-time">{{ note.createdAt | date:'short' }}</span>
+                  <span *ngIf="note.isInternal" class="internal-badge">Internal</span>
+                </div>
+                <div class="note-content">{{ note.content }}</div>
+              </div>
+            </div>
+
+            <!-- Add New Note -->
+            <div class="add-note">
+              <h5>Add Note to User</h5>
+              <div class="note-form">
+                <textarea 
+                  [(ngModel)]="newNote" 
+                  class="form-control"
+                  placeholder="Type your message to the user..."
+                  rows="3"
+                ></textarea>
+                <button 
+                  class="btn btn-success"
+                  (click)="addNote()"
+                  [disabled]="addingNote || !newNote.trim()"
+                >
+                  <span *ngIf="addingNote">Sending...</span>
+                  <span *ngIf="!addingNote">Send Note</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Ratings Section -->
+  <div class="ratings-section card">
+    <h3>My Ratings ({{ myRatings.length }} total)</h3>
+    
+    <div *ngIf="myRatings.length === 0" class="empty-message">
+      No ratings received yet.
+    </div>
+
+    <div *ngIf="myRatings.length > 0" class="ratings-list">
+      <div *ngFor="let rating of myRatings" class="rating-item">
+        <div class="rating-header">
+          <span class="rating-stars">{{ getRatingStars(rating.rating) }}</span>
+          <span class="rating-value">{{ rating.rating }}/5</span>
+          <span class="rating-date">{{ rating.createdAt | date:'short' }}</span>
+        </div>
+        <div class="rating-feedback" *ngIf="rating.feedback">
+          "{{ rating.feedback }}"
+        </div>
+        <div class="rating-ticket">
+          Ticket #{{ rating.ticketId }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
