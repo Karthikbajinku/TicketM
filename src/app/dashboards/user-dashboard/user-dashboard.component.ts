@@ -88,7 +88,7 @@ export class UserDashboardComponent implements OnInit {
 
   calculateStats(): void {
     this.totalTickets = this.tickets.length;
-    this.openTickets = this.tickets.filter(t => t.status === 'OPEN' || t.status === 'IN_PROGRESS' || t.status === 'AWAITING').length;
+    this.openTickets = this.tickets.filter(t => t.status === 'OPEN' || t.status === 'IN_PROGRESS' || t.status === 'AWAITING_RESPONSE').length;
     this.resolvedTickets = this.tickets.filter(t => t.status === 'RESOLVED').length;
   }
 
@@ -153,9 +153,9 @@ export class UserDashboardComponent implements OnInit {
     this.submittingRating = true;
     const ratingData = {
       ticketId: this.ticketToRate.id,
-      agentId: this.ticketToRate.agentId!,
-      rating: this.ratingForm.value.rating,
-      feedback: this.ratingForm.value.feedback || undefined
+      agentId: this.ticketToRate.assignedTo!.id,
+      score: this.ratingForm.value.rating,
+      comments: this.ratingForm.value.feedback || undefined
     };
 
     this.ticketService.addRating(ratingData).subscribe({
@@ -197,7 +197,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   canRate(ticket: Ticket): boolean {
-    return ticket.status === 'RESOLVED' && ticket.agentId != null;
+    return ticket.status === 'RESOLVED' && ticket.assignedTo != null;
   }
 
   setActiveTab(tab: string): void {
