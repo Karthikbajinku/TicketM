@@ -39,13 +39,13 @@ export class LoginComponent implements OnInit {
     this.error = '';
 
     this.authService.login(this.loginForm.value).subscribe({
-      next: (response) => {
+      next: (user) => {
         this.loading = false;
         this.redirectBasedOnRole();
       },
       error: (error) => {
         this.loading = false;
-        this.error = 'Invalid username or password';
+        this.error = 'Invalid email or password';
         console.error('Login error:', error);
       }
     });

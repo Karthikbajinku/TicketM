@@ -20,7 +20,4 @@ export interface RegisterRequest {
   category?: string;
 }
 
-export interface LoginResponse {
-  token: string;
-  user: User;
-}
+// No separate LoginResponse needed - backend returns User directly
