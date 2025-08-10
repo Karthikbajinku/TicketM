@@ -16,14 +16,26 @@ export class AppComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Hide navbar on login/register pages
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.showNavbar = !this.isAuthPage(event.url);
-      }
-    });
+    console.log('App component initializing...');
+
+    try {
+      // Hide navbar on login/register pages
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe({
+        next: (event) => {
+          if (event instanceof NavigationEnd) {
+            this.showNavbar = !this.isAuthPage(event.url);
+            console.log('Navigation completed to:', event.url);
+          }
+        },
+        error: (error) => {
+          console.error('Router navigation error:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error setting up router subscription:', error);
+    }
 
     // Enhanced global error handler
     window.addEventListener('error', (event) => {
