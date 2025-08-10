@@ -5,13 +5,49 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-root',
   template: `
-    <app-navbar *ngIf="showNavbar"></app-navbar>
-    <router-outlet></router-outlet>
+    <div class="app-container">
+      <app-navbar *ngIf="showNavbar && !hasError"></app-navbar>
+      <div class="main-content">
+        <div *ngIf="hasError" class="error-container">
+          <h2>Something went wrong</h2>
+          <p>Please refresh the page to try again.</p>
+          <button class="btn btn-primary" (click)="refreshPage()">Refresh Page</button>
+        </div>
+        <router-outlet *ngIf="!hasError"></router-outlet>
+      </div>
+    </div>
   `,
-  styles: []
+  styles: [`
+    .app-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .main-content {
+      flex: 1;
+    }
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50vh;
+      padding: 2rem;
+      text-align: center;
+    }
+    .error-container h2 {
+      color: #dc3545;
+      margin-bottom: 1rem;
+    }
+    .error-container p {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+  `]
 })
 export class AppComponent implements OnInit {
   showNavbar = true;
+  hasError = false;
 
   constructor(private router: Router) {}
 
@@ -47,6 +83,7 @@ export class AppComponent implements OnInit {
         error: event.error,
         stack: event.error?.stack
       });
+      this.hasError = true;
       event.preventDefault();
     });
 
@@ -56,11 +93,16 @@ export class AppComponent implements OnInit {
         promise: event.promise,
         stack: event.reason?.stack
       });
+      this.hasError = true;
       event.preventDefault();
     });
   }
 
   private isAuthPage(url: string): boolean {
     return url === '/login' || url === '/register';
+  }
+
+  refreshPage(): void {
+    window.location.reload();
   }
 }
