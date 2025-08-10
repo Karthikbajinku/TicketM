@@ -107,10 +107,10 @@ export class AgentDashboardComponent implements OnInit {
   }
 
   updateTicketStatus(): void {
-    if (!this.selectedTicket || !this.selectedStatus) return;
+    if (!this.selectedTicket || !this.selectedStatus || !this.currentUser) return;
 
     this.updatingStatus = true;
-    this.ticketService.updateTicketStatus(this.selectedTicket.ticketId, this.selectedStatus).subscribe({
+    this.ticketService.updateTicketStatus(this.selectedTicket.ticketId, this.selectedStatus, this.currentUser.id).subscribe({
       next: (updatedTicket) => {
         // Update the ticket in the list
         const index = this.tickets.findIndex(t => t.id === updatedTicket.id);
