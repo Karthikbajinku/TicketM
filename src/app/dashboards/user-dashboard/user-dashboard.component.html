@@ -71,13 +71,11 @@
                 <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
                   {{ ticket.status.replace('_', ' ') }}
                 </span>
-                <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">
-                  {{ ticket.priority }}
-                </span>
+<!-- Priority not available in backend -->
               </div>
             </div>
             <div class="ticket-meta">
-              <span>{{ ticket.category }} / {{ ticket.subcategory }}</span>
+              <span>{{ ticket.category }} / {{ ticket.subCategory }}</span>
               <span>Created: {{ ticket.createdAt | date:'short' }}</span>
             </div>
             <div class="ticket-description">
@@ -210,24 +208,20 @@
           <p><strong>Description:</strong> {{ selectedTicket.description }}</p>
           <div class="ticket-meta-details">
             <div class="meta-row">
-              <span><strong>Category:</strong> {{ selectedTicket.category }} / {{ selectedTicket.subcategory }}</span>
+              <span><strong>Category:</strong> {{ selectedTicket.category }} / {{ selectedTicket.subCategory }}</span>
               <span class="status-badge" [ngClass]="getStatusClass(selectedTicket.status)">
                 {{ selectedTicket.status.replace('_', ' ') }}
               </span>
             </div>
             <div class="meta-row">
               <span><strong>Priority:</strong> 
-                <span class="priority-badge" [ngClass]="getPriorityClass(selectedTicket.priority)">
-                  {{ selectedTicket.priority }}
-                </span>
+<!-- Priority not available in backend -->
               </span>
             </div>
             <div class="meta-row">
               <span><strong>Created:</strong> {{ selectedTicket.createdAt | date:'medium' }}</span>
             </div>
-            <div class="meta-row" *ngIf="selectedTicket.updatedAt !== selectedTicket.createdAt">
-              <span><strong>Last Updated:</strong> {{ selectedTicket.updatedAt | date:'medium' }}</span>
-            </div>
+<!-- Last updated not available in backend -->
           </div>
         </div>
 
@@ -237,10 +231,10 @@
           <div class="messages-list">
             <div *ngFor="let note of ticketNotes" class="message-item">
               <div class="message-header">
-                <strong>{{ note.authorName }}</strong>
+                <strong>{{ note.author.name }}</strong>
                 <span class="message-time">{{ note.createdAt | date:'short' }}</span>
               </div>
-              <div class="message-content">{{ note.content }}</div>
+              <div class="message-content">{{ note.note }}</div>
             </div>
           </div>
         </div>

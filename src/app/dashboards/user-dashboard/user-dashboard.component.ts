@@ -130,7 +130,7 @@ export class UserDashboardComponent implements OnInit {
   loadTicketNotes(ticketId: number): void {
     this.ticketService.getTicketNotes(ticketId).subscribe({
       next: (notes) => {
-        this.ticketNotes = notes.filter(note => !note.isInternal);
+        this.ticketNotes = notes; // Show all notes since isInternal not available
       },
       error: (error) => {
         console.error('Error loading ticket notes:', error);

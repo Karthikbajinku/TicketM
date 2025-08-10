@@ -85,7 +85,7 @@ export class AgentDashboardComponent implements OnInit {
       this.averageRating = 0;
       return;
     }
-    const sum = this.myRatings.reduce((acc, rating) => acc + rating.rating, 0);
+    const sum = this.myRatings.reduce((acc, rating) => acc + rating.score, 0);
     this.averageRating = Math.round((sum / this.myRatings.length) * 10) / 10;
   }
 
