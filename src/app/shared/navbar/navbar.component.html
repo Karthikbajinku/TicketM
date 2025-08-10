@@ -5,11 +5,11 @@
     </div>
     
     <div class="navbar-center">
-      <span class="role-badge" [ngClass]="'role-' + currentUser?.role?.toLowerCase()">
+      <span class="role-badge" [ngClass]="'role-' + (currentUser?.role || '').toLowerCase()">
         {{ currentUser?.role }}
       </span>
     </div>
-    
+
     <div class="navbar-right">
       <span class="user-info">
         Welcome, {{ currentUser?.username }}
