@@ -176,7 +176,7 @@ export class AgentDashboardComponent implements OnInit {
   }
 
   getStatusOptions(): string[] {
-    return ['IN_PROGRESS', 'AWAITING', 'RESOLVED'];
+    return ['IN_PROGRESS', 'AWAITING_RESPONSE', 'RESOLVED'];
   }
 
   canUpdateStatus(): boolean {

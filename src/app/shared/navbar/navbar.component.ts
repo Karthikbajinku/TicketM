@@ -40,6 +40,6 @@ export class NavbarComponent implements OnInit {
   }
 
   getUserName(): string {
-    return this.currentUser ? this.currentUser.username : '';
+    return this.currentUser ? this.currentUser.name : '';
   }
 }
