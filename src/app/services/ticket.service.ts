@@ -16,9 +16,7 @@ export class TicketService {
   ) {}
 
   private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
   }
@@ -66,22 +64,36 @@ export class TicketService {
     });
   }
 
-  updateTicketStatus(ticketId: string, status: string): Observable<Ticket> {
-    return this.http.put<Ticket>(`${this.baseUrl}/tickets/${ticketId}/status`, { status }, {
+  updateTicketStatus(ticketId: string, status: string, performedById: number, note?: string): Observable<Ticket> {
+    let params = new URLSearchParams();
+    params.append('status', status);
+    params.append('performedById', performedById.toString());
+    if (note) {
+      params.append('note', note);
+    }
+
+    return this.http.put<Ticket>(`${this.baseUrl}/tickets/${ticketId}/status?${params.toString()}`, null, {
       headers: this.getHeaders()
     });
   }
 
-  updateTicketDescription(ticketId: string, description: string): Observable<Ticket> {
-    return this.http.put<Ticket>(`${this.baseUrl}/tickets/${ticketId}/description`, { description }, {
-      headers: this.getHeaders()
+  updateTicketDescription(ticketId: string, description: string, userId: number): Observable<Ticket> {
+    const params = new URLSearchParams();
+    params.append('userId', userId.toString());
+
+    return this.http.put<Ticket>(`${this.baseUrl}/tickets/${ticketId}/description?${params.toString()}`, description, {
+      headers: { 'Content-Type': 'text/plain' }
     });
   }
 
   // Notes operations
   addNote(noteData: { ticketId: number; authorId: number; note: string }): Observable<TicketNote> {
-    return this.http.post<TicketNote>(`${this.baseUrl}/notes/add`, noteData, {
-      headers: this.getHeaders()
+    const params = new URLSearchParams();
+    params.append('ticketId', noteData.ticketId.toString());
+    params.append('authorId', noteData.authorId.toString());
+
+    return this.http.post<TicketNote>(`${this.baseUrl}/notes/add?${params.toString()}`, noteData.note, {
+      headers: { 'Content-Type': 'text/plain' }
     });
   }
 
