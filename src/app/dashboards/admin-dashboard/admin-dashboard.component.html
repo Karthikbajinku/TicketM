@@ -220,9 +220,7 @@
             <span class="status-badge" [ngClass]="getStatusClass(selectedTicket.status)">
               {{ selectedTicket.status.replace('_', ' ') }}
             </span>
-            <span class="priority-badge" [ngClass]="getPriorityClass(selectedTicket.priority)">
-              {{ selectedTicket.priority }}
-            </span>
+            <!-- Priority not available in backend -->
             <span>Created: {{ selectedTicket.createdAt | date:'short' }}</span>
           </div>
         </div>
