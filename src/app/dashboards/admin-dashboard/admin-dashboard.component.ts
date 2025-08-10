@@ -160,7 +160,7 @@ export class AdminDashboardComponent implements OnInit {
 
   getAgentName(agentId: number): string {
     const agent = this.agents.find(a => a.id === agentId);
-    return agent ? agent.username : 'Unassigned';
+    return agent ? agent.name : 'Unassigned';
   }
 
   getAverageRating(agentId: number): number {
