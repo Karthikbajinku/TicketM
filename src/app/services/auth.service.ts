@@ -15,14 +15,19 @@ export class AuthService {
     this.loadUserFromStorage();
   }
 
-  login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, credentials)
+  login(credentials: LoginRequest): Observable<User> {
+    // Backend expects form data, not JSON
+    const formData = new FormData();
+    formData.append('email', credentials.email);
+    formData.append('password', credentials.password);
+
+    return this.http.post<User>(`${this.baseUrl}/login`, formData)
       .pipe(
-        tap(response => {
+        tap(user => {
           try {
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('user', JSON.stringify(response.user));
-            this.currentUserSubject.next(response.user);
+            // No token in response, just store user
+            localStorage.setItem('user', JSON.stringify(user));
+            this.currentUserSubject.next(user);
           } catch (error) {
             console.error('Error storing login data:', error);
             throw error;
@@ -32,11 +37,11 @@ export class AuthService {
   }
 
   register(userData: RegisterRequest): Observable<User> {
+    // Backend expects JSON body for registration
     return this.http.post<User>(`${this.baseUrl}/register`, userData);
   }
 
   logout(): void {
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);
   }
@@ -45,12 +50,8 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return !!this.getCurrentUser();
   }
 
   hasRole(role: string): boolean {
@@ -69,7 +70,6 @@ export class AuthService {
       console.error('Error loading user from storage:', error);
       // Clear corrupted data
       localStorage.removeItem('user');
-      localStorage.removeItem('token');
       this.currentUserSubject.next(null);
     }
   }
