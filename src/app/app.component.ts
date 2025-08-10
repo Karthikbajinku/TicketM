@@ -73,29 +73,40 @@ export class AppComponent implements OnInit {
       console.error('Error setting up router subscription:', error);
     }
 
-    // Enhanced global error handler
+    // Simplified error handler to prevent [object Event] issues
     window.addEventListener('error', (event) => {
-      console.error('Global error caught:', {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        error: event.error,
-        stack: event.error?.stack
-      });
-      this.hasError = true;
-      event.preventDefault();
+      const errorDetails = {
+        message: event.message || 'Unknown error',
+        filename: event.filename || 'Unknown file',
+        lineno: event.lineno || 0,
+        colno: event.colno || 0,
+        stack: event.error?.stack || 'No stack trace'
+      };
+      console.error('Application error:', JSON.stringify(errorDetails, null, 2));
+      return true; // Prevent default browser error handling
     });
 
     window.addEventListener('unhandledrejection', (event) => {
-      console.error('Unhandled promise rejection:', {
-        reason: event.reason,
-        promise: event.promise,
-        stack: event.reason?.stack
-      });
-      this.hasError = true;
-      event.preventDefault();
+      console.error('Promise rejection:', event.reason);
+      return true; // Prevent default browser error handling
     });
+
+    // Specifically handle webpack-dev-server events
+    if (typeof EventSource !== 'undefined') {
+      const originalEventSource = EventSource.prototype.addEventListener;
+      EventSource.prototype.addEventListener = function(type, listener, options) {
+        const wrappedListener = (event) => {
+          if (event && typeof event === 'object' && event.constructor === Event) {
+            console.log('EventSource event intercepted:', type, event);
+            return;
+          }
+          if (typeof listener === 'function') {
+            return listener(event);
+          }
+        };
+        return originalEventSource.call(this, type, wrappedListener, options);
+      };
+    }
   }
 
   private isAuthPage(url: string): boolean {
